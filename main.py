@@ -13,9 +13,10 @@ def getpages():
     return int (pages)
 
 max_pages = getpages()
-all_books = []
+all_names = []
+anzahl_eintraege = 0
 
-for page in tqdm(range(1, max_pages + 1), desc="Pages:", position=0):
+for page in tqdm(range(1, 2), desc="Pages:", position=0):
     url = "https://books.toscrape.com/catalogue/page-{}.html".format(page)
     r = requests.get(url="https://books.toscrape.com/catalogue/page-{}.html".format(page))
     doc = pq(r.content)
@@ -23,8 +24,10 @@ for page in tqdm(range(1, max_pages + 1), desc="Pages:", position=0):
         link = "https://books.toscrape.com/catalogue/"+link.attrib["href"]
         r = requests.get(link)
         doc = pq(r.content)
-        all_books.append(doc("h1").text())
-print(all_books)
+        all_names.append(doc("h1").text())
+        anzahl_eintraege += 1
+print(all_names)
+print(f"{anzahl_eintraege} Bücher gefunden.")
 
 
 
