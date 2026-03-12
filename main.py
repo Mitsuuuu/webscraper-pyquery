@@ -1,8 +1,16 @@
 import requests
 from pyquery import PyQuery as pq
 
-r = requests.get("https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html")
-doc = pq(r.content)
-print(doc("h1").text())
-print(doc("p.price_color").text())
-print(doc("p.instock.availability").text())
+
+def getpages():
+    r = requests.get("https://books.toscrape.com/index.html")
+    doc = pq(r.content)
+    pages = doc("li.current").text()
+    pages = pages.split(" of ")
+    pages = pages[1]
+    return int (pages)
+##  aka: return int(doc("li.current").text().split(" of ")[1])
+
+max_pages = getpages()
+
+print(max_pages)
