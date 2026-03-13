@@ -17,7 +17,7 @@ anzahl_eintraege = 0
 zahl = int (input("Aktion auswählen:"))
 match zahl:
     case 1:
-        for page in tqdm(range(1, 2), desc="Pages:", position=0):
+        for page in tqdm(range(1, max_pages +1), desc="Pages:", position=0):
             url = "https://books.toscrape.com/catalogue/page-{}.html".format(page)
             r = requests.get(url="https://books.toscrape.com/catalogue/page-{}.html".format(page))
             doc = pq(r.content)
