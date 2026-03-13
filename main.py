@@ -1,8 +1,8 @@
-import requests
-from pyquery import PyQuery as pq
+from Scraping.PageLoop import page_loop
 
-r = requests.get("https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html")
-doc = pq(r.content)
-print(doc("h1").text())
-print(doc("p.price_color").text())
-print(doc("p.instock.availability").text())
+
+zahl = int (input("Aktion auswählen:"))
+match zahl:
+    case 1:
+        names = page_loop()
+        print(names)
