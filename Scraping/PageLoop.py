@@ -12,5 +12,4 @@ def page_loop():
         r = requests.get(url="https://books.toscrape.com/catalogue/page-{}.html".format(page))
         doc = pq(r.content)
         all_names.append(book_name_collection(doc))
-    return all_names
-
+    return all_names # Gibt alle Namen in einer Liste zurück
