@@ -28,6 +28,7 @@ match zahl:
                 all_names.append(doc("h1").text())
                 anzahl_eintraege += 1
 
+
 print(f"{anzahl_eintraege} Bücher gefunden.")
 print(all_names)
 
