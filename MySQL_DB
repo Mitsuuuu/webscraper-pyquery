@@ -1,0 +1,40 @@
+-- Datenbank erstellen
+CREATE DATABASE WebscrapingDB;
+USE MedienDB;
+
+-- Tabelle Genre
+CREATE TABLE Genre (
+    Genre_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Genre_Name VARCHAR(25) NOT NULL
+);
+
+-- Tabelle Medientypen
+CREATE TABLE Medientypen (
+    Medientyp_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Medientyp VARCHAR(10) NOT NULL
+);
+
+-- Tabelle Artikel
+CREATE TABLE Artikel (
+    Artikel_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Genre_ID INT,
+    Medientyp_ID INT,
+    Preis FLOAT,
+    Groesse_Beschreibung INT,
+    UPC VARCHAR(20),
+    Daten_menge_thumbnail INT,
+    Buchtitel VARCHAR(100),
+
+    -- Fremdschlüssel
+    CONSTRAINT fk_genre
+        FOREIGN KEY (Genre_ID)
+        REFERENCES Genre(Genre_ID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_medientyp
+        FOREIGN KEY (Medientyp_ID)
+        REFERENCES Medientypen(Medientyp_ID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
