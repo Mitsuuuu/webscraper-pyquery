@@ -1,4 +1,4 @@
-INSERT INTO genre (Genre_ID, Genre_Name) VALUES
+INSERT INTO Genre (Genre_ID, Genre_Name) VALUES
 (1, 'Fantasy'),
 (2, 'Science Fiction'),
 (3, 'Krimi'),
@@ -6,13 +6,13 @@ INSERT INTO genre (Genre_ID, Genre_Name) VALUES
 
 
 
-INSERT INTO medientypen (Medientyp_ID, Medientyp) VALUES
+INSERT INTO Medientypen (Medientyp_ID, Medientyp) VALUES
 (1, 'Buch'),
 (2, 'E-Book'),
 (3, 'Audio'),
 (4, 'Video');
 
-INSERT INTO artikel (Artikel_ID, Genre_ID, Medientyp_ID, Preis, Groesse_Beschreibung, UPC, Daten_menge_thumbnail, Buchtitel) VALUES
+INSERT INTO Artikel (Artikel_ID, Genre_ID, Medientyp_ID, Preis, Groesse_Beschreibung, UPC, Daten_menge_thumbnail, Buchtitel) VALUES
 (1, 1, 1, 19.99, 300, '978-3-16-148410-0', 5, 'Die fantastische Reise'),
 (2, 2, 2, 9.99, 250, '978-3-16-148411-7', 3, 'Raumschiff Abenteuer'),
 (3, 3, 1, 14.50, 400, '978-3-16-148412-4', 2, 'Der geheimnisvolle Fall'),
