@@ -111,7 +111,7 @@ def scrape_books(session, max_pages=2):
         medientyp_cache[name] = medientyp_id
         return medientyp_id
 
-    for page in tqdm(range(1, 3), desc="Seiten"):
+    for page in tqdm(range(1, max_pages+1), desc="Seiten"):
         url = f"https://books.toscrape.com/catalogue/page-{page}.html"
 
         try:
@@ -199,7 +199,7 @@ if __name__ == "__main__":
     session = requests.Session()
     max_pages = getpages(session)
 
-    books = scrape_books(session, max_pages=3)  # use max_pages for full scrape
+    books = scrape_books(session, max_pages=50)  # use max_pages for full scrape
 
     print("Anzahl Bücher:", len(books))
 
