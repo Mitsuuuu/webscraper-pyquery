@@ -1,8 +1,11 @@
-import mysql.connector
+from sqlalchemy import create_engine
 
 def connect_to_database():
-    scraper_data = mysql.connector.connect(
-        host="stardrop-saloon.de:3306",
-        user="root",
-        password="alohomoraberlin"
- )
+        user="root"
+        password = "alohomoraberlin"
+        host = "stardrop-saloon.de"
+        port = 3306
+        database = "WebscrapingDB"
+
+        engine = create_engine(f'mysql+pymysql://{user}:{password}@{host}:{port}/{database}')
+        return engine

@@ -59,13 +59,16 @@ def collection_loop():
 def lists_to_dataframe():
     all_links, all_titles, all_prices,all_genres, all_mediatypes, all_UPCs, length_description, size_thumbnail = collection_loop()
 
-    df = pd.DataFrame({"Titel":              all_titles,
+    df_books = pd.DataFrame({"Titel":              all_titles,
                        "Link":               all_links,
                        "Preis":              all_prices,
-                       "Genre":              all_genres,
-                       "Medientyp":          all_mediatypes,
                        "UPC":                all_UPCs,
                        "Länge_Beschreibung": length_description,
                        "Größe_Thumbnail":    size_thumbnail})
+    df_mediatype = pd.DataFrame({
+                       "Medientyp":          all_mediatypes})
 
-    return df
+    df_genre = pd.DataFrame({
+                       "Genre":              all_genres})
+
+    return df_books, df_mediatype, df_genre
