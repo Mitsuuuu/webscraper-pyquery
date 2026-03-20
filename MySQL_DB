@@ -24,6 +24,7 @@ CREATE TABLE Artikel (
     UPC VARCHAR(20),
     Daten_menge_thumbnail INT,
     Buchtitel VARCHAR(100),
+    Link VARCHAR(300) UNIQUE,
 
     -- Fremdschlüssel
     CONSTRAINT fk_genre
