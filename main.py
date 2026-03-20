@@ -11,10 +11,10 @@ pd.set_option("display.max_colwidth", None)
 # DB connection
 def datenbank_connection():
     return mysql.connector.connect(
-        host="127.0.0.1",
-        port=3307,
+        host="stardrop-saloon.de",
+        port=3306,
         user="root",
-        password="",
+        password="alohomoraberlin",
         database="WebscrapingDB"
     )
 
@@ -68,7 +68,7 @@ def getpages(session):
 
 
 # Scraping
-def scrape_books(session, max_pages=50):
+def scrape_books(session, max_pages=2):
     books = []
 
     conn = datenbank_connection()
@@ -111,7 +111,7 @@ def scrape_books(session, max_pages=50):
         medientyp_cache[name] = medientyp_id
         return medientyp_id
 
-    for page in tqdm(range(1, max_pages+1), desc="Seiten"):
+    for page in tqdm(range(1, 3), desc="Seiten"):
         url = f"https://books.toscrape.com/catalogue/page-{page}.html"
 
         try:
@@ -199,7 +199,7 @@ if __name__ == "__main__":
     session = requests.Session()
     max_pages = getpages(session)
 
-    books = scrape_books(session, max_pages=50)  # use max_pages for full scrape
+    books = scrape_books(session, max_pages=3)  # use max_pages for full scrape
 
     print("Anzahl Bücher:", len(books))
 
