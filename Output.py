@@ -7,10 +7,11 @@ import seaborn as sns
 # 1️⃣ Verbindung zur Datenbank
 # -------------------------------
 conn = mysql.connector.connect(
-    host="localhost",
+    host="stardrop-saloon.de",
     user="root",
-    password="",
-    database="WebscrapingDB"
+    password="alohomoraberlin",
+    database="WebscrapingDB",
+    port=3306,
 )
 
 cursor = conn.cursor(dictionary=True)
