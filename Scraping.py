@@ -16,6 +16,7 @@ def collection_loop():
     all_titles = []
     all_prices = []
     all_UPCs = []
+    all_mediatypes = []
     all_genres = []
     length_description = []
     size_thumbnail = []
@@ -34,11 +35,14 @@ def collection_loop():
             # Titel
             all_titles.append(doc("h1").text())
 
-            # Preis, UPC, Genre
+            # Preis, UPC, Medientyp
             tds = doc("td").text().split(" ")
             all_UPCs.append(tds[0])     #UPC
-            all_genres.append(tds[1])   #Genre
+            all_mediatypes.append(tds[1])   #Medientyp
             all_prices.append(tds[3])   #Preis
+
+            #Genre
+            all_genres.append(doc(".breadcrumb > li > a").eq(2).text())
 
             #Länge Beschreibung
             words = (re.findall(r"\b[\w']+\b", doc("p").text()))
@@ -50,15 +54,16 @@ def collection_loop():
             size_thumbnail.append((response.headers.get('Content-Length', "Filesize nicht gefunden")))
 
 
-    return all_links, all_titles, all_prices, all_genres, all_UPCs, length_description, size_thumbnail
+    return all_links, all_titles, all_prices, all_genres, all_mediatypes, all_UPCs, length_description, size_thumbnail
 
 def lists_to_dataframe():
-    all_links, all_titles, all_prices,all_genres, all_UPCs, length_description, size_thumbnail = collection_loop()
+    all_links, all_titles, all_prices,all_genres, all_mediatypes, all_UPCs, length_description, size_thumbnail = collection_loop()
 
     df = pd.DataFrame({"Titel":              all_titles,
                        "Link":               all_links,
                        "Preis":              all_prices,
                        "Genre":              all_genres,
+                       "Medientyp":          all_mediatypes,
                        "UPC":                all_UPCs,
                        "Länge_Beschreibung": length_description,
                        "Größe_Thumbnail":    size_thumbnail})
