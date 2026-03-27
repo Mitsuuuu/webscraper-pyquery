@@ -140,8 +140,8 @@ def scrape_books(session, max_pages=2):
                 match = re.search(r"\d+\.\d+", price_raw)
                 price = float(match.group()) if match else None
 
-                description = doc_book("#product_description + p").text()
-                description_len = len(description) if description else 0
+                words = (re.findall(r"\b[\w']+\b", doc("p").text()))
+                description_len = len(words)
 
                 upc = doc_book("th:contains('UPC') + td").text()
 
