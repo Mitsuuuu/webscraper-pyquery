@@ -1,0 +1,13 @@
+SET @rowindex := -1;
+
+SELECT AVG(Daten_menge_thumbnail) AS median
+FROM (
+  SELECT Daten_menge_thumbnail,
+         @rowindex := @rowindex + 1 AS rowindex
+  FROM Artikel
+  ORDER BY Daten_menge_thumbnail
+) AS t
+WHERE rowindex IN (
+  FLOOR(@rowindex / 2),
+  CEIL(@rowindex / 2)
+);
