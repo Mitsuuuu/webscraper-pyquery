@@ -1,14 +1,16 @@
-from tqdm import tqdm
-import requests
-from pyquery import PyQuery as pq
-import mysql.connector
-import pandas as pd
-import re
+# Import required libraries
+from tqdm import tqdm  # progress bars
+import requests  # HTTP requests
+from pyquery import PyQuery as pq  # HTML parsing
+import mysql.connector  # MySQL connection
+import pandas as pd  # data handling
+import re  # regex for text processing
 
+# Show full text in pandas columns
 pd.set_option("display.max_colwidth", None)
 
 
-# DB connection
+# Create a connection to the MySQL database
 def datenbank_connection():
     return mysql.connector.connect(
         host="stardrop-saloon.de",
@@ -18,11 +20,13 @@ def datenbank_connection():
         database="WebscrapingDB"
     )
 
-# Create tables
+
+# Create necessary tables if they do not exist
 def create_tables():
     conn = datenbank_connection()
     cursor = conn.cursor()
 
+    # Table for genres
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Genre (
             Genre_ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,6 +34,7 @@ def create_tables():
         );
     """)
 
+    # Table for media types (e.g., book)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Medientypen (
             Medientyp_ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -37,6 +42,7 @@ def create_tables():
         );
     """)
 
+    # Main table for storing book data
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Artikel (
             Artikel_ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,27 +65,35 @@ def create_tables():
     conn.close()
 
 
-# Get number of pages
+# Get total number of pages from the website
 def getpages(session):
     r = session.get("https://books.toscrape.com/index.html", timeout=5)
     doc = pq(r.content)
+
+    # Extract text like "Page 1 of 50"
     text = doc("li.current").text()
+
+    # Return total number of pages
     return int(text.split(" of ")[1])
 
 
-# Scraping
+# Scrape book data from the website
 def scrape_books(session, max_pages=2):
     books = []
 
+    # Connect to database
     conn = datenbank_connection()
     cursor = conn.cursor()
 
+    # Caches to avoid duplicate DB queries
     genre_cache = {}
     medientyp_cache = {}
 
+    # Get or insert genre and return its ID
     def get_genre_id(name):
         if not name:
             return None
+
         if name in genre_cache:
             return genre_cache[name]
 
@@ -95,6 +109,7 @@ def scrape_books(session, max_pages=2):
         genre_cache[name] = genre_id
         return genre_id
 
+    # Get or insert media type and return its ID
     def get_medientyp_id(name):
         if name in medientyp_cache:
             return medientyp_cache[name]
@@ -111,6 +126,7 @@ def scrape_books(session, max_pages=2):
         medientyp_cache[name] = medientyp_id
         return medientyp_id
 
+    # Loop through all pages
     for page in tqdm(range(1, max_pages+1), desc="Seiten"):
         url = f"https://books.toscrape.com/catalogue/page-{page}.html"
 
@@ -122,30 +138,40 @@ def scrape_books(session, max_pages=2):
 
         doc = pq(r.content)
 
+        # Loop through all books on the page
         for link in tqdm(doc("h3 > a"), desc="Bücher", leave=False):
             try:
+                # Build full book URL
                 book_link = "https://books.toscrape.com/catalogue/" + link.attrib["href"]
 
+                # Request book detail page
                 r_book = session.get(book_link, timeout=5)
                 doc_book = pq(r_book.content)
 
+                # Extract book title
                 title = doc_book("h1").text()
 
+                # Extract genre and get its ID
                 genre_name = doc_book("ul.breadcrumb li:nth-child(3) a").text()
                 genre_id = get_genre_id(genre_name)
 
+                # Set media type as "Buch"
                 medientyp_id = get_medientyp_id("Buch")
 
+                # Extract price using regex
                 price_raw = doc_book(".price_color").eq(0).text()
                 match = re.search(r"\d+\.\d+", price_raw)
                 price = float(match.group()) if match else None
 
+                # Extract description length (word count)
                 description_text = doc_book("#product_description ~ p").text()
                 words = re.findall(r"\b[\w']+\b", description_text)
                 description_len = len(words)
 
+                # Extract UPC code
                 upc = doc_book("th:contains('UPC') + td").text()
 
+                # Extract image and calculate its size in bytes
                 img_tag = doc_book(".item.active img").attr("src")
                 if img_tag:
                     img_url = "https://books.toscrape.com/" + img_tag.replace("../", "")
@@ -157,6 +183,7 @@ def scrape_books(session, max_pages=2):
                 else:
                     thumbnail_size = None
 
+                # Store collected data
                 books.append((
                     title,
                     book_link,
@@ -172,17 +199,19 @@ def scrape_books(session, max_pages=2):
                 print(f"Fehler bei Buch: {e}")
                 continue
 
+        # Save changes after each page
         conn.commit()
 
     conn.close()
     return books
 
 
-# Insert into DB
+# Insert scraped books into the database
 def insert_books(books):
     conn = datenbank_connection()
     cursor = conn.cursor()
 
+    # Insert data and ignore duplicates (same link)
     cursor.executemany("""
         INSERT IGNORE INTO Artikel
         (Buchtitel, Link, Genre_ID, Medientyp_ID, Preis,
@@ -193,20 +222,29 @@ def insert_books(books):
     conn.commit()
     conn.close()
 
-# Main
+
+# Main program execution
 if __name__ == "__main__":
+    # Create tables
     create_tables()
 
+    # Start session for requests
     session = requests.Session()
+
+    # Get number of pages
     max_pages = getpages(session)
 
-    books = scrape_books(session, max_pages=50)  # use max_pages for full scrape
+    # Scrape books (limit to 50 pages here)
+    books = scrape_books(session, max_pages=50)
 
+    # Print number of books scraped
     print("Anzahl Bücher:", len(books))
 
+    # Convert to pandas DataFrame
     df = pd.DataFrame(books, columns=[
         "Buchtitel", "Link", "Genre_ID", "Medientyp_ID",
         "Preis", "Groesse_Beschreibung", "UPC", "Daten_menge_thumbnail"
     ])
 
+    # Insert data into database
     insert_books(books)
